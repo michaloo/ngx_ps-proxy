@@ -1,0 +1,31 @@
+containers:
+    proxy_it:
+        image: michaloo/ngx_ps-proxy
+        dockerfile: .
+        run:
+            publish: ["80:80"]
+            volume: [".:/ngx_ps-proxy"]
+            env:
+                - APP_PORT_80_TCP_ADDR=docker.local
+                - APP_PORT_80_TCP_PORT=8080
+                - APP_DOMAIN=docker.local
+            rm: true
+            interactive: true
+            tty: true
+            entrypoint: bash
+    proxy:
+        image: michaloo/ngx_ps-proxy
+        dockerfile: .
+        run:
+            publish: ["80:80"]
+            volume: [".:/ngx_ps-proxy"]
+            link: ["nginx:app"]
+            env:
+                - APP_DOMAIN=docker.local
+            detach: true
+    nginx:
+        image: nginx
+        run:
+            publish: ["8080:80"]
+            volume: ["./tests:/usr/share/nginx/html:ro"]
+            detach: true
